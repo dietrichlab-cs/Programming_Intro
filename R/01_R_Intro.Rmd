@@ -1,0 +1,255 @@
+---
+title: "R Intro"
+output: html_document
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+## Operations
+
+```{r}
+# standard arithmetic + - * /
+6 / 2
+```
+
+```{r}
+# order of operations
+4*4+4
+```
+
+```{r}
+# some division magic
+
+# regular division
+5 / 2
+
+# whole number division
+5 %/% 2
+
+# whole number remainder of division
+5 %% 2
+```
+
+## Datatypes and Variables
+
+```{r}
+# assign a variable
+x <- 5
+```
+
+```{r}
+# datatypes
+# numeric
+x <- 5
+x
+# character
+x = "String"
+x
+# boolean (logical)
+x <- TRUE
+x
+```
+
+```{r}
+# operations on datatypes
+x <- String" + "5"
+x
+```
+
+```{r}
+# not all operations between datatypes work
+x = "String" + 5
+x
+```
+
+```{r}
+# Operations on variables
+x <- 5
+y <- 9
+z <- x + y
+z
+```
+
+## Functions
+
+```{r}
+# declare a function
+addition <- function(x,y) {
+  return(x + y)
+}
+```
+
+```{r}
+# use the function
+addition(2, 5)
+```
+
+```{r}
+# functions dont need to return anything
+addition_no_output <- function(x,y) {
+  print(x + y)
+}
+addition_no_output(5, 2)
+```
+
+### build in functions
+
+```{r}
+# print output to the console
+print("Hello World")
+
+# mathematical functions. Functions can be chained
+print(max(3, 5))
+```
+
+## Collections (vectors, lists, etc.)
+
+```{r}
+# Vector of strings (all elements are of same type, pretty much a list)
+list_of_numbers <- c(1,2,3,3)
+list_of_numbers
+
+# c for custom elements
+c(1,2,3,3)
+# rep for repeating elements
+rep(1, times=4)
+# seq for sequence of elements
+seq(1, 10, by=2)
+```
+
+```{r}
+# operations on vectors
+
+# length
+length(list_of_numbers)
+
+# access element
+list_of_numbers[1]
+
+# slice of list
+list_of_numbers[seq(2, length(list_of_numbers))]
+
+# change element
+list_of_numbers[1] <- 10
+list_of_numbers
+```
+
+```{r}
+# lists can contain multiple datatypes
+list_of_stuff <- list(1, "Test", TRUE)
+list_of_stuff
+```
+
+```{r}
+# access elements -> double brackets return element on its own, single brackets return element as list
+list_of_stuff[1]
+list_of_stuff[[1]]
+```
+
+## Logic
+
+```{r}
+# equality
+5 == 5
+5 == "5"
+5 != "5"
+```
+
+```{r}
+# logical operators
+statement1 <- 3 < 5
+statement2 <- 3 > 5
+
+print(statement1 && statement2)
+print(statement1 || statement2)
+```
+
+```{r}
+# order of logical operators and brackets
+print(!(TRUE && FALSE))
+```
+
+```{r}
+# control flow
+x <- 5
+if (x >= 3) {
+  print("X is larger or equals to 3")
+} else {
+  print("X is smaller than 3") 
+}
+```
+
+```{r}
+# chaining if statements
+x <- 5
+if (x > 3) {
+  print("X is larger than 3")
+} else if (x == 3) {
+  print("X equals 3") 
+} else {
+  print("X is smaller than 3") 
+}
+```
+
+## Loops
+
+```{r}
+# vector from early: 
+list_of_numbers
+
+# for-each loop
+for (value in list_of_numbers) {
+  print(paste(c("List contains value", value), collapse = " "))
+}
+```
+
+```{r}
+# for-i loop
+for(i in 1:length(list_of_numbers)) {
+  print(paste(c("List contains value", list_of_numbers[i]), collapse = " "))
+}
+```
+
+```{r}
+# while loop
+counter <- 0
+while (counter < 10) {
+  print(paste(c("Iteration", counter), collapse = " "))
+  counter <- counter + 1
+}
+```
+
+## DataFrames
+
+```{r}
+# DataFrames -> named columns matrix
+Data_Frame <- data.frame (
+  Sample = c("Sample1", "Sample2", "Sample3"),
+  Counts = c(100, 150, 120),
+  Quality = c(60, 30, 45)
+)
+
+Data_Frame
+
+# summarized the dataframe
+summary(Data_Frame) 
+```
+
+```{r}
+# access column by index
+Data_Frame[1]
+
+# access column by name
+Data_Frame[["Sample"]]
+
+# alternative access column by name
+Data_Frame$Sample
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

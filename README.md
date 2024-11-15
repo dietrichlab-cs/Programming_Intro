@@ -1,4 +1,4 @@
-# Programming intro
+## Programming intro
 This repository offers a simple introduction to Python and R for beginners or those reviewing basics. Perfect for learning Python and starting with data analysis.
 
 It covers: 
@@ -9,5 +9,5 @@ It covers:
 * R
   * fundamentals 
 
-# Contributing
-If you have interesting resources feel free to either suggest them in the issue section or contribute them to `learning_ressources.md`.
+## Contributing
+If you have interesting resources feel free to either suggest them in the issue section or contribute them to `learning_resources.md`.

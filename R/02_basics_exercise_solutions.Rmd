@@ -1,0 +1,227 @@
+---
+title: "R Basic exercise"
+output: html_document
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+### Exercise 1: Operations
+a) Write a function that checks if a given number is even or odd and returns the answer as boolean.
+
+b) Write a function that checks if a given number is a prime number and returns the answer as boolean.
+
+c) Write a function that has three parameters "(float) num1", "(float) num2" and "(string) operation" that has the functionality of a basic calculator and performes the calculation:
+num1 operation num2 = output
+
+```{r}
+# a)
+evenOrOdd <- function(num) {
+  return(num %% 2 == 0)
+}
+
+evenOrOdd(2)
+```
+```{r}
+#b)
+is_prime <- function(num) {
+  if (num < 2) {
+    return(FALSE)
+  } else if (num == 2) {
+    return(TRUE)
+  }
+  for (i in 2:sqrt(num)) {
+    if (num %% i == 0) {
+      return(FALSE)
+    }
+  }
+  return(TRUE)
+}
+
+is_prime(2)
+is_prime(4)
+is_prime(7)
+```
+```{r}
+#c)
+calculator <- function(num1, num2, operation) {
+    if (operation == "+") {
+      return(num1 + num2)
+    } else if (operation == "-") {
+      return(num1 - num2)
+    } else if (operation == "*") {
+      return(num1 * num2)
+    } else if (operation == "/") {
+      return(num1 / num2)
+    } else{
+        return("Invalid operation")
+    }
+}
+
+calculator(5, 2, "+")
+calculator(5, 2, "-")
+calculator(5, 2, "*")
+calculator(5, 2, "/")
+calculator(5, 2, "invalid")
+```
+
+### Exercise 2: Lists
+
+a) Write an R program that finds the largest number in a vector. (Without using the max() function)
+
+b) Write an R program that finds the smallest number in a vector.
+(Without using the min() function)
+
+c) Write an R program that removes duplicates from a vector. (Without using the set() function and without using sets at all or the dictionary data type and similar)
+
+```{r}
+#a)
+largest_number <- function(vec) {
+  if (length(vec) == 0) {
+    stop("Vector is empty")
+  }
+  running_max <- vec[1]
+  for (num in vec) {
+    if (num > running_max) {
+      running_max <- num
+    }
+  }
+  return(running_max)
+}
+
+largest_number(c(3,46,1,3,13,67,845))
+```
+```{r}
+#b)
+smallest_number <- function(vec) {
+  if (length(vec) == 0) {
+    stop("Vector is empty")
+  }
+  running_min <- vec[1]
+  for (num in vec) {
+    if (num < running_min) {
+      running_min <- num
+    }
+  }
+  return(running_min)
+}
+
+smallest_number(c(3,46,1,3,13,67,845))
+```
+```{r}
+#c)
+remove_duplicates <- function(vec) {
+  if (length(vec) == 0) {
+    stop("Vector is empty")
+  }
+  set_of_vec <- vector()
+  for (element in vec) {
+    if (!(element %in% set_of_vec)) {
+      set_of_vec <- append(set_of_vec, element)
+    }
+  }
+  return(set_of_vec)
+}
+
+remove_duplicates(c(1,1,1,2,3,4,1,4,3,2,5,7,2,5,6,7))
+```
+
+### Bonus Exercise 3: String Manipulation
+
+a) Writes two functions that encode and decode a text using the Caesar cipher. The Caesar cipher is a simple substitution cipher in which each letter of the plain text is substituted with a letter found by moving n places down the alphabet. For example with a shift of 1, A would be replaced by B, B would become C, and so on. The method is apparently named after Julius Caesar, who apparently used it to communicate with his officials. Caesar ciphers can use any integer value as a shift.
+HINT: Look either into Unicode characters or if you create an alphabet take letter case into account
+
+b) Write an R program that counts the number of vowels in a given string.
+
+```{r}
+#a)
+caesar_encode <- function(input, shift) {
+  alphabet <- strsplit("abcdefghijklmnopqrstuvwxyz", "")[[1]]
+  lower_case <- tolower(input)
+  code_string <- character()
+  for (letter in strsplit(lower_case, "")[[1]]) {
+    if (!(letter %in% alphabet)) {
+      code_string <- append(code_string, letter)
+    } else {
+      idx <- which(alphabet == letter)
+      idx <- (idx + shift) %% length(alphabet)
+      code_string <- append(code_string, alphabet[idx])
+    }
+  }
+  return(paste(code_string, collapse = ''))
+}
+
+caesar_decode <- function(input, shift) {
+  alphabet <- strsplit("abcdefghijklmnopqrstuvwxyz", "")[[1]]
+  lower_case <- tolower(input)
+  code_string <- character()
+  for (letter in strsplit(lower_case, "")[[1]]) {
+    if (!(letter %in% alphabet)) {
+      code_string <- append(code_string, letter)
+    } else {
+      idx <- which(alphabet == letter)
+      idx <- (idx - shift) %% length(alphabet)
+      code_string <- append(code_string, alphabet[idx])
+    }
+  }
+  return(paste(code_string, collapse = ''))
+}
+
+encoded <- caesar_encode("Hallo Welt", 30)
+print(encoded)
+caesar_decode(encoded, 30)
+```
+```{r}
+#b)
+vowel_counter <- function(input) {
+  vowel_count <- 0
+  input <- tolower(input)
+  vowels <- c("a", "e", "i", "o", "u")
+  for (letter in strsplit(input, "")[[1]]) {
+    if (letter %in% vowels) vowel_count <- vowel_count + 1
+  }
+  return(vowel_count)
+}
+vowel_counter("Hallo Welt")
+```
+
+### Advanced Bonus Exercise 4: Functions and Recursion
+
+a) Write an R function that calculates the factorial of a number (a non-negative integer). The function should take the number as an argument and return the factorial. The factorial of a number n is the product of all numbers from 1 up to and including n.
+HINT: Don't use any implemented factorial function, look into recursion
+
+
+b) Use dynamic programming for this problem: Given a staircase with n steps. Determine the number of possible ways to climb the stairs if you can take either 1, 2 or 3 steps at a time.
+Take also step 0 into account, i.e. climbing a stair with 0 steps has 1 possible way.
+HINT: Dynamic programming involves iterating all possible scenarios with recursion. Start by thinking of way to climb a single stair, then 2, then n > 2.  
+```{r}
+#a) 
+factorial_n <- function(n) {
+  if (n == 0) {
+    return(1)
+  } else {
+    return(n*factorial_n(n-1))
+  }
+}
+
+factorial_n(3)
+factorial_n(11)
+```
+```{r}
+#b)
+count_ways_to_climb <- function(n) {
+  if (n <= 0) return(0)
+  # this vector will contain all the ways to climb a stair with i steps as the i-th element.
+  ways_to_climb_stair <- rep(1, times=n)
+  # remember that R starts counting at index 1 so we need to offset our DP
+  for (i in 1:n+1) {
+    if (i >= 2) ways_to_climb_stair[i] <- ways_to_climb_stair[i-1]
+    if (i >= 3) ways_to_climb_stair[i] <- ways_to_climb_stair[i] + ways_to_climb_stair[i-2]
+    if (i >= 4) ways_to_climb_stair[i] <- ways_to_climb_stair[i] + ways_to_climb_stair[i-3]
+  }
+  return(ways_to_climb_stair[n+1])
+}
+count_ways_to_climb(16)
+```
+
