@@ -3,11 +3,11 @@ This repository offers a simple introduction to Python and R for beginners or th
 
 It covers: 
 * Python
-  * fundamentals
+  * fundamentals with exercises
   * data handling with Pandas
   * data visualization using Seaborn and Matplotlib
 * R
-  * fundamentals 
+  * fundamentals with exercises
 
 ## Contributing
 If you have interesting resources feel free to either suggest them in the issue section or contribute them to `learning_resources.md`.
