@@ -107,3 +107,60 @@ price_per_carat <- function(row) {
 
 df_diamonds$price_per_carat <- apply(df_diamonds, 1, price_per_carat)
 
+
+# Data Aggregation and Grouping
+df_iris <- read.csv("../datasets/iris.csv")
+grouped <- aggregate(. ~ species, data = df_iris, FUN = mean)
+print(grouped)
+
+#Merging
+
+df1 <- data.frame(
+  A = c('A0', 'A1', 'A2', 'A3'),
+  B = c('B0', 'B1', 'B2', 'B3'),
+  key = c('K0', 'K1', 'K2', 'K3')
+)
+
+df2 <- data.frame(
+  C = c('C0', 'C1', 'C2', 'C3'),
+  D = c('D0', 'D1', 'D2', 'D3'),
+  key = c('K0', 'K1', 'K2', 'K4')
+)
+
+# Inner Join
+print("\nInner Join:")
+inner_join <- merge(df1, df2, by = "key", all = FALSE)
+print(inner_join)
+
+# Left Join
+print("\nLeft Join:")
+left_join <- merge(df1, df2, by = "key", all.x = TRUE)
+print(left_join)
+
+# Right Join
+print("\nRight Join:")
+right_join <- merge(df1, df2, by = "key", all.y = TRUE)
+print(right_join)
+
+# Outer Join
+print("\nOuter Join:")
+outer_join <- merge(df1, df2, by = "key", all = TRUE)
+print(outer_join)
+
+#Concatinate 
+df1 <- data.frame(
+  A = c('A0', 'A1', 'A2', 'A3'),
+  B = c('B0', 'B1', 'B2', 'B3'),
+  key = c('K0', 'K1', 'K2', 'K3')
+)
+
+df2 <- data.frame(
+  A = c('A4', 'A5', 'A6', 'A7'),
+  B = c('B4', 'B5', 'B6', 'B7'),
+  key = c('K4', 'K5', 'K6', 'K7')
+)
+
+concatenated <- rbind(df1, df2)
+print("Concatenated DataFrame:")
+print(concatenated)
+
