@@ -1,0 +1,300 @@
+---
+title: "Data handling in R with the tidy package"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+options(max.print = 30)
+```
+
+# 1. dplyr
+
+`dplyr` is a library from the tidyverse which allows us to use a different, more expressive syntax when working with datasets.
+The general idea is, that you build a chain of transformations on your data instead of performing each step one-by-one.
+It also introduces a new type of dataframe which is called a `tibble`.
+
+```{r}
+# we first load the dataset and the library
+library(dplyr)
+
+df_iris <- read.csv("datasets/iris.csv")
+#Summarize
+summary(df_iris)
+```
+# 2. exploring the data
+
+Next, we will start to use `dplyr` to explore our data. The objectives are the same as in the native R notebook.
+
+```{r}
+#Select a column
+df_iris %>% pull(sepal_length)
+```
+```{r}
+#Select multiple columns
+df_iris %>% select(sepal_length, sepal_width)
+```
+```{r}
+#Select multiple columns and only specific rows
+df_iris %>% 
+  slice(1:10) %>% 
+  select(sepal_length, sepal_width)
+```
+```{r}
+#Find indexes that match a condition
+df_iris %>% 
+  mutate(sepal_length_gt_6 = sepal_length > 6.0) %>% 
+  pull(sepal_length_gt_6)
+```
+```{r}
+# Conditional selection
+df_iris %>% 
+  filter(sepal_length > 6.0)
+```
+```{r}
+# Multiple Conditions
+df_iris %>% 
+  filter(sepal_length > 6.0, species == "versicolor")
+```
+```{r}
+df_iris %>% 
+  filter(sepal_length > 6.0 | species == "versicolor")
+```
+
+# 3. Handling missing values
+
+Now that we have know how to explore our data, we want to look into handling missing values. As the `iris` dataset is complete, we will load a different dataset which has missing or empty values. For this we will also load the `tidyr` library which offers even more soffisticated functions for use in our tidyverse pipelines. 
+
+```{r}
+library(dplyr)
+library(tidyr)
+# load dataset
+df_titanic <- read.csv("datasets/titanic.csv")
+df_titanic
+```
+
+```{r}
+# Identify missing data
+missing_data_counts <- df_titanic %>%
+  summarise(across(everything(), ~ sum(is.na(.)))) %>%
+  pivot_longer(cols = everything(), names_to = "column", values_to = "missing_count")
+
+missing_data_counts
+```
+```{r}
+# the missing data does not take into account blank values. For the computer, an empty but defined string is not missing just empty.
+# In the preview below, don't forget to click through the column pages. You will see the deck column having loads of empty values
+
+# Adjust for blank values as missing
+is_missing <- function(x) {
+  is.na(x) | x == ""
+}
+
+missing_data_counts <- df_titanic %>%
+  summarise(across(everything(), ~ sum(is_missing(.)))) %>%
+  pivot_longer(cols = everything(), names_to = "column", values_to = "missing_count")
+
+missing_data_counts
+```
+
+### Option 1: Drop rows with missing values
+There are different strategies, how to handle missing data. The most straight forward one is just dropping all rows in our dataframe.
+The drawback is, that you potentially drop quite a few rows as you can see below. The initial dataset has 891 entries, after filtering we are left with 182.
+```{r}
+df_titanic_clean <- df_titanic %>%
+  filter(!if_any(everything(), is_missing))
+
+df_titanic_clean
+```
+
+### Option 2: Fill missing values with default value
+We can also fill our missing values with default values. 
+Here, we will introduce a solution tailored to the columns data type. For numerical values, we set the value to -1, for character/string columns to the value `missing`.
+NOTE: If we have boolean columns for example, we could simply add another `else if` to assign those columns the appropriate values. 
+```{r}
+missing_data_copy_counts <- df_titanic %>%
+  mutate(across(everything(), ~ if_else(is_missing(.), if (is.numeric(.)) -1 
+                                        else if (is.character(.)) "missing" 
+                                        else as(NA, class(.)), .)))
+missing_data_copy_counts
+```
+
+### Option 3: Fill missing values with mean value
+Another approach is to fill in the empty or missing values with the mean of all other values in the column. 
+This does only work for numerical columns. Here we will do it for the `age` column. 
+NOTE: For this example we set it to the negative mean, so you can more easily see which values have been filled in. 
+```{r}
+missing_data_copy_counts <- df_titanic %>%
+  mutate(age = if_else(is_missing(age), - mean(age, na.rm = TRUE), age))
+missing_data_copy_counts
+```
+
+### Option 4: Fill missing values with the most frequent (mode) value
+And as the last approach we fill in the empty or missing values with the most frequent of all other values in the column. 
+This does work for all columns types. The most frequent value is also called mode. Here we will apply this mutation to the `embarked` and `deck` columns.
+NOTE: For this example we add a prefix to the filled in value, so you can more easily see which values have been filled in. 
+```{r}
+# Define a function for calculating mode
+mode <- function(x) {
+  missing_values <- is_missing(x)
+  uniq_x <- unique(x[!missing_values])
+  uniq_x[which.max(tabulate(match(x, uniq_x)))]
+}
+
+# Fill missing values in `embarked` with the mode
+most_freq_val <- mode(df_titanic$embarked)
+
+missing_data_copy_counts <- df_titanic %>%
+  mutate(across(c("embarked", "deck"), ~ if_else(is_missing(.), paste("filled_", mode(.)), .)))
+
+missing_data_copy_counts
+```
+
+# Renaming columns
+
+```{r}
+# we quickly reload the dataset
+df_titanic_rename <- read.csv("datasets/titanic.csv")
+# Rename a singular column
+df_titanic_rename <- df_titanic_rename %>%
+  rename(ticket_class = class)
+
+df_titanic_rename
+```
+
+# Apply functions rowwise
+So far we have a looked at mainly whole dataset or whole column operations. But if you need to, you can also apply functions to each individual row and add the result as an additional column.
+NOTE: We load a new small dataset in this task which contains information on diamonds. 
+
+```{r}
+# Load the diamonds dataset
+df_diamonds <- read.csv("datasets/diamonds.csv")
+
+# Define the function
+price_per_carat <- function(carat_value, price_value) {
+  if (carat_value > 0) {
+    return(price_value / carat_value)
+  } else {
+    return(0)
+  }
+}
+
+# Apply row-wise function
+df_diamonds <- df_diamonds %>%
+  rowwise() %>%
+  mutate(price_per_carat = price_per_carat(carat, price)) %>%
+  ungroup()
+
+# The new column is appended as the last column (you might need to navigate to more columns)
+df_diamonds
+```
+
+# Data Aggregation and Grouping
+
+We can group our data by some categorical variable and get the mean of all other features.
+
+```{r}
+# Aggregate data by species, calculating the mean for all other columns
+grouped <- df_iris %>%
+  group_by(species) %>%
+  summarise(across(everything(), \(x) mean(x, na.rm = TRUE)))
+
+grouped
+```
+
+Or we can group our data by some categorical variable and get the mean of some specific columns.
+
+```{r}
+# Aggregate data by species, calculating the mean for all other columns
+grouped <- df_iris %>%
+  group_by(species) %>%
+  summarise(across(c(sepal_length, sepal_width), \(x) mean(x, na.rm = TRUE)))
+
+grouped
+```
+
+# Merging
+
+If we have more than one dataframe but they shard an index on which we want to merge them (e.g. two runs of the data) we can merge (i.e. join) them.
+
+```{r}
+# First define our two dataframes
+df1 <- data.frame(
+  A = c('A0', 'A1', 'A2', 'A3'),
+  B = c('B0', 'B1', 'B2', 'B3'),
+  key = c('K0', 'K1', 'K2', 'K3')
+)
+
+df2 <- data.frame(
+  C = c('C0', 'C1', 'C2', 'C3'),
+  D = c('D0', 'D1', 'D2', 'D3'),
+  key = c('K0', 'K1', 'K2', 'K4')
+)
+
+df1
+df2
+```
+
+### Inner join
+The inner join merges the dataframe on an index and only keeps rows from both dataframe that lie in the intersection according to the index. 
+In the result we see the entries with `key == K3` from `df1` and `key == K4` from `df2` missing as they are only present in their respective dataframes but not in the intersection.
+
+![inner-join](images/img_inner_join.png)
+
+```{r}
+inner_join <- df1 %>%
+  inner_join(df2, by = "key")
+inner_join
+```
+
+
+### Left join
+The left join merges the dataframe on an index and keeps all entries from the `left` dataframe while adding the entries from the intersection with the `right` dataframe on an index column. 
+In the result we see the entry with `key == K4` from `df2` missing as it from the `right` (`df2`) dataframe and not in the intersection with the `left` (`df1`) one.
+You can also see the entry with `key == K3` does not have values for columns `C` or `D` as it is not present in `df2`.
+
+![left-join](images/img_left_join.png)
+
+```{r}
+left_join <- df1 %>%
+  left_join(df2, by = "key")
+left_join
+```
+
+### Right join
+The right join is just the opposite of the left join. You can always swap the order of dataframes to get from left to right join. 
+In the result we see the entry with `key == K3` from `df1` missing as it from the `left` (`df1`) dataframe and not in the intersection with the `right` (`df2`) one.
+
+![right-join](images/img_right_join.png)
+
+```{r}
+right_join <- df1 %>%
+  right_join(df2, by = "key")
+right_join
+```
+
+### Outer join
+The outer join takes the union over both dataframes, so where our inner join dropped the entries with `key == K3 || key == K4`, they are now included.
+
+![outer-join](images/img_outer_join.png)
+
+```{r}
+outer_join <- df1 %>%
+  full_join(df2, by = "key")
+outer_join
+```
+
+### Concatenation
+
+Sometimes you don't want to combine columns from dataframes but rather just concatenate their rows with different data points.
+In concatenation we do not merge on a key column. If there are columns in one dataframe that do not exist in the other one, then default `NA` values will be added to rows not having this column.
+```{r}
+concatenated <- bind_rows(df1, df2)
+concatenated
+```
+
+
+
+
+

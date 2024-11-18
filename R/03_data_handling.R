@@ -1,5 +1,5 @@
 # 1.Load Data
-df_iris <- read.csv("../datasets/iris.csv")
+df_iris <- read.csv("datasets/iris.csv")
 #Summarize 
 summary(df_iris)
 
