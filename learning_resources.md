@@ -115,6 +115,13 @@ It does contain pretty much everything you ever need to know about R and its fun
 
 ### Tutorials
 
+#### CSAMA labs
+
+Link: [CSAMA lab repository](https://github.com/Bioconductor/CSAMA-labs)
+
+Description: The CSAMA lab repository contains condensed and to-the-point R notebooks on not just the basics of R but also many bioinformatics related libraries in the BioConductoR environment. The labs are definetly advanced, but with the help of ChatGPT for example, it should be no problem to understand all the steps taken. 
+The focus is less on the programming basics and more on the statistical usage of R.  
+
 #### r-statistics.co
 
 Link: [R Statistics](https://r-statistics.co/)
