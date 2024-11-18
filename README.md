@@ -8,6 +8,7 @@ It covers:
   * data visualization using Seaborn and Matplotlib
 * R
   * fundamentals with exercises
+  * Data handling
 
 ## Contributing
 If you have interesting resources feel free to either suggest them in the issue section or contribute them to `learning_resources.md`.
