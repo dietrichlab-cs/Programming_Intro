@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+*.csv
+*.tsv
+*.txt
+
 # R
 .RData
 .Rhistory
