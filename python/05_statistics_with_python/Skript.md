@@ -1,6 +1,6 @@
 # Fun With ~~Flags~~ Stats
 
-## Intro
+## Intro 
 Recap:
 - Start importing experiment data from treatment  "05_statistics_with_python/examples/data/example_1/example_1_treatments.csv"
 - Grouping data
@@ -40,4 +40,20 @@ Recap:
 - Show p-Values are equally distributed -> What can we do about this?
 
 ## Benjamini Hochberg Correction
-- 
+- Sort p-Values
+- Calculate critical values for alpha level.
+- Find biggest index where p-Values is smaller than critical value and accept all tests with smaller p-Values
+
+## Testing if we have counts.
+- Example we have genes and mutated gene read counts for controll group and cancer group and want to find out if the muattion status and cancer group are not independent from each other.
+- Chi Squared Test
+
+## Differential expression analysis. 
+- Permutation Test
+- DESeq2
+
+## Correlation 
+- Correlation
+
+## Linear Regression
+- Linear Regression
